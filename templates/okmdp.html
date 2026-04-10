@@ -3,9 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ok_password</title>
+    <title>Mot de passe généré</title>
 </head>
 <body>
-    <h1>retrouvez le mot de passe dans la console</h1>
+    <h1>Succès !</h1>
+    <p>Le mot de passe pour le site <strong>{{ name_site }}</strong> est :</p>
+    
+    <div style="background-color: #f4f4f4; padding: 10px; border: 1px solid #ccc; word-break: break-all;">
+        <code>{{ mdp }}</code>
+    </div>
+
+    <br>
+    <a href="/form">Générer un autre mot de passe</a>
 </body>
 </html>
