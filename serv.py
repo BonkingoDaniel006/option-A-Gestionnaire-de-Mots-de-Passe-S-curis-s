@@ -1,76 +1,127 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 import random
 import string
 import csv
+import json
 import os
+import math
+from datetime import datetime
 
 app = Flask(__name__)
 
-FICHIER_CSV = 'mots_de_passe.csv'
+FICHIER_JSON = 'coffre_fort.json'
+FICHIER_CSV = 'sauvegarde_export.csv'
+CATEGORIES = ["Réseaux sociaux", "Banque", "Email", "Travail", "Autre"]
 
-def initialiser_csv():
-    if not os.path.exists(FICHIER_CSV):
-        with open(FICHIER_CSV, mode='w', newline='', encoding='utf-8') as f:
-            writer = csv.writer(f)
-            writer.writerow(['site', 'mot_de_passe'])
-
-@app.route("/")
-def home():
-    return render_template("home.html")
-
-@app.route("/create_mdp", methods=["POST"])
-def create_mdp():
-    site = request.form.get("nom_site")
-    longueur_str = request.form.get("longueur")
-    longueur = int(longueur_str) if longueur_str and longueur_str.isdigit() else 12
+def sauvegarder(comptes):
+    with open(FICHIER_JSON, 'w', encoding='utf-8') as f:
+        json.dump(comptes, f, indent=4, ensure_ascii=False)
     
-    # Choix du type de mot de passe (via le formulaire)
-    type_mdp = request.form.get("type_mdp")
-
-    if type_mdp == "prononcable":
-        # Définition des sets de caractères (sans ambigus)
-        voyelles = "aeiouy"
-        consonnes = "bcdfghjkmnpqrstvwxz"
-        
-        password = ""
-        for i in range(longueur):
-            if i % 2 == 0:
-                password += random.choice(consonnes)
-            else:
-                password += random.choice(voyelles)
-    else:
-        # Ta logique actuelle (aléatoire complet)
-        source = string.ascii_letters + string.digits + "!@#$%"
-        ambigus = "0Ol1I"
-        source_filtree = "".join([c for c in source if c not in ambigus])
-        password = ''.join(random.choice(source_filtree) for _ in range(longueur))
-    
-    initialiser_csv()
-    with open(FICHIER_CSV, mode='a', newline='', encoding='utf-8') as f:
+    with open(FICHIER_CSV, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
-        writer.writerow([site, password])
+        writer.writerow(['site', 'categorie', 'mdp', 'date_creation', 'score'])
+        for c in comptes:
+            writer.writerow([c['site'], c['categorie'], c['mdp'], c['date_creation'], c['score']])
+
+def charger_donnees():
+    if not os.path.exists(FICHIER_JSON):
+        return []
+    try:
+        with open(FICHIER_JSON, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except:
+        return []
+
+def generer_mdp(longueur=16, type_mdp="complexe"):
+    ambigus = "0Ol1I"
+    if type_mdp == "prononcable":
+        voyelles = "".join([c for c in "aeiouy" if c not in ambigus])
+        consonnes = "".join([c for c in "bcdfghjkmnpqrstvwxz" if c not in ambigus])
+        mdp = "".join(random.choice(consonnes if i % 2 == 0 else voyelles) for i in range(longueur))
+    else:
+        source = "".join([c for c in (string.ascii_letters + string.digits + "!@#$%") if c not in ambigus])
+        mdp = "".join(random.choice(source) for _ in range(longueur))
+    return mdp
+
+def analyser_force(mdp):
+    longueur = len(mdp)
+    r = 0
+    if any(c in string.ascii_lowercase for c in mdp): r += 26
+    if any(c in string.ascii_uppercase for c in mdp): r += 26
+    if any(c in string.digits for c in mdp): r += 10
+    if any(c in "!@#$%" for c in mdp): r += 5
     
-    return render_template("okmdp.html", mdp=password, name_site=site)
+    if r == 0: return 0
+    entropie = longueur * math.log2(r)
+    return min(100, int((entropie / 80) * 100))
 
-@app.route("/form")
-def form():
-    return render_template("formulaire-d'ajout.html")
+def calculer_stats(comptes):
+    if not comptes:
+        return {"total": 0, "moyenne": 0, "faibles": 0}
+    moyenne = sum(c['score'] for c in comptes) / len(comptes)
+    faibles = len([c for c in comptes if c['score'] < 50])
+    return {"total": len(comptes), "moyenne": round(moyenne, 2), "faibles": faibles}
 
+def detecter_doublons(comptes):
+    groupes_mdp = {}
+    for c in comptes:
+        mdp = c['mdp']
+        if mdp in groupes_mdp:
+            groupes_mdp[mdp].append(c['site'])
+        else:
+            groupes_mdp[mdp] = [c['site']]
+    
+    doublons = {mdp: sites for mdp, sites in groupes_mdp.items() if len(sites) > 1}
+    return doublons
 
 @app.route("/rechercher")
 def rechercher():
     query = request.args.get("query", "").lower()
-    resultats = []
-    
-    if os.path.exists(FICHIER_CSV):
-        with open(FICHIER_CSV, mode='r', encoding='utf-8') as f:
-            reader = csv.DictReader(f)
-            for ligne in reader:
-                # On cherche si le nom du site contient le texte tapé
-                if query in ligne['site'].lower():
-                    resultats.append(ligne)
-    
+    comptes = charger_donnees()
+    resultats = [c for c in comptes if query in c['site'].lower() or query in c['categorie'].lower()]
     return render_template("resultats.html", resultats=resultats, query=query)
+
+@app.route("/create_mdp", methods=["POST"])
+def ajouter_compte():
+    comptes = charger_donnees()
+    site = request.form.get("nom_site")
+    cat = request.form.get("categorie")
+    long = int(request.form.get("longueur", 16))
+    t_mdp = request.form.get("type_mdp")
+
+    if any(c['site'].lower() == site.lower() for c in comptes):
+        return "Erreur : Ce site existe déjà !", 400
+
+    password = generer_mdp(long, t_mdp)
+    score = analyser_force(password)
+
+    nouveau = {
+        "site": site,
+        "categorie": cat,
+        "mdp": password,
+        "date_creation": datetime.now().strftime("%Y-%m-%d"),
+        "score": score
+    }
+
+    comptes.append(nouveau)
+    sauvegarder(comptes)
+    return render_template("okmdp.html", mdp=password, name_site=site, score=score)
+
+@app.route("/")
+def home():
+    comptes = charger_donnees()
+    stats = calculer_stats(comptes)
+    doublons = detecter_doublons(comptes)
+    return render_template("home.html", stats=stats, doublons=doublons)
+
+@app.route("/form")
+def form():
+    return render_template("formulaire-d'ajout.html", categories=CATEGORIES)
+
+@app.route("/liste")
+def lister_comptes():
+    comptes = charger_donnees()
+    return render_template("liste.html", comptes=comptes)
 
 if __name__ == "__main__":
     app.run(debug=True)

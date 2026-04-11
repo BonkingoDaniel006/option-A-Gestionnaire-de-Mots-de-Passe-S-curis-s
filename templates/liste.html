@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des comptes</title>
+</head>
+<body>
+    <h1>Tous mes comptes</h1>
+    <table border="1" cellpadding="10">
+        <thead>
+            <tr>
+                <th>Site</th>
+                <th>Catégorie</th>
+                <th>Mot de passe</th>
+                <th>Créé le</th>
+                <th>Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in comptes %}
+            <tr>
+                <td>{{ c.site }}</td>
+                <td>{{ c.categorie }}</td>
+                <td><code>{{ c.mdp }}</code></td>
+                <td>{{ c.date_creation }}</td>
+                <td>{{ c.score }}/100</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+    <a href="/">Retour</a>
+</body>
+</html>
