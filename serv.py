@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request
 import random
 import string
 import csv
@@ -34,13 +34,29 @@ def charger_donnees():
 
 def generer_mdp(longueur=16, type_mdp="complexe"):
     ambigus = "0Ol1I"
+    
     if type_mdp == "prononcable":
+        # 1. Préparation des listes sans caractères ambigus
         voyelles = "".join([c for c in "aeiouy" if c not in ambigus])
         consonnes = "".join([c for c in "bcdfghjkmnpqrstvwxz" if c not in ambigus])
-        mdp = "".join(random.choice(consonnes if i % 2 == 0 else voyelles) for i in range(longueur))
+        numbers = "".join([c for c in string.digits if c not in ambigus])
+        
+        # 2. Construction du mot de passe en alternant 3 types
+        mdp_list = []
+        for i in range(longueur):
+            if i % 3 == 0:
+                mdp_list.append(random.choice(consonnes))
+            elif i % 3 == 1:
+                mdp_list.append(random.choice(voyelles))
+            else:
+                mdp_list.append(random.choice(numbers))
+        mdp = "".join(mdp_list)
+        
     else:
+        # Mode complexe (mélange total)
         source = "".join([c for c in (string.ascii_letters + string.digits + "!@#$%") if c not in ambigus])
         mdp = "".join(random.choice(source) for _ in range(longueur))
+        
     return mdp
 
 def analyser_force(mdp):
