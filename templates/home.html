@@ -21,7 +21,7 @@
     <a href="/liste"><button>Voir tous les comptes</button></a>
     {% if doublons %}
         <div style="background-color: #ffcccc; border: 2px solid red; padding: 10px; margin-bottom: 20px;">
-        <h3 style="color: red; margin-top: 0;">⚠️ Alerte Sécurité : Mots de passe en double</h3>
+        <h3 style="color: red; margin-top: 0;"> Alerte Sécurité : Mots de passe en double</h3>
         <ul>
             {% for mdp, sites in doublons.items() %}
                 <li>Le mot de passe <code>{{ mdp }}</code> est utilisé pour : <strong>{{ sites|join(', ') }}</strong></li>
