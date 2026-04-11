@@ -68,6 +68,8 @@ def analyser_force(mdp):
     if any(c in "!@#$%" for c in mdp): r += 5
     
     if r == 0: return 0
+    # formule de l'entropie E=L×log2​(R)
+    #le resultat est exprimé en bit-entropie
     entropie = longueur * math.log2(r)
     return min(100, int((entropie / 80) * 100))
 
