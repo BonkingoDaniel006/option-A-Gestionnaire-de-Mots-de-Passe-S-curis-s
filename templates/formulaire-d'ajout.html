@@ -8,10 +8,23 @@
 <body>
     <h1>Remplissez les element pour ajouter un compte et un mot de passe</h1>
     <form action="/create_mdp" method="post">
-        <label for="nom_site">Nom du site:</label>
+        <label for="nom_site">Nom du site :</label>
         <input type="text" id="nom_site" name="nom_site" required>
-        <br>
-        <button type="submit">Generer</button>
-    </form>
+    
+        <br><br>
+    
+        <label for="longueur">Longueur (8-64) :</label>
+        <input type="number" id="longueur" name="longueur" min="8" max="64" value="16">
+    
+        <br><br>
+
+        <label for="type_mdp">Type de mot de passe :</label>
+        <select name="type_mdp" id="type_mdp">
+            <option value="complexe">Complexe (Aléatoire)</option>
+            <option value="prononcable">Prononçable (Alterné)</option>
+        </select>
+    
+    <button type="submit">Générer et Enregistrer</button>
+</form>
 </body>
 </html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Résultats de recherche</title>
+</head>
+<body>
+    <h1>Résultats pour : "{{ query }}"</h1>
+
+    {% if resultats %}
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Site</th>
+                    <th>Mot de passe</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in resultats %}
+                <tr>
+                    <td>{{ r.site }}</td>
+                    <td><code>{{ r.mot_de_passe }}</code></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Aucun compte trouvé pour ce site.</p>
+    {% endif %}
+
+    <br>
+    <a href="/">Retour à l'accueil</a>
+</body>
+</html>

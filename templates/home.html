@@ -7,6 +7,12 @@
 </head>
 <body>
     <h1> bienvenue</h1>
+    <div class="search-bar">
+    <form action="/rechercher" method="GET">
+        <input type="text" name="query" placeholder="Rechercher un site" required>
+        <button type="submit">Rechercher</button>
+    </form>
+    </div>
     <a href="{{ url_for('form') }}">
         <button type="button">Générer un mot de passe</button>
     </a>
