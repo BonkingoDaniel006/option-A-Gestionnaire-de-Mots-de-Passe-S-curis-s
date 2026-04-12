@@ -1,0 +1,29 @@
+body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-image: url("/static/profils/kali-linux-wallpaper-v7.png");
+      color: #ffffff;
+    }
+
+.search-bar {
+      flex: 1;
+      margin: 0 10px;
+    }
+
+.search-bar input {
+      width: 50%;
+      padding: 10px 5px;
+      border: none;
+      border-radius: 30px;
+      outline: none;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    }
+
+
+.bouton {
+    padding: 10px 5px;
+    border: none;
+    border-radius: 30px;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+}

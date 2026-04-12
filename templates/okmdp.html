@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Succès</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+</head>
+<body>
+    <h1>Compte ajouté avec succès !</h1>
+    <p>Site : <strong>{{ name_site }}</strong></p>
+    <p>Mot de passe : <code>{{ mdp }}</code></p>
+    <p>Score de force : <strong>{{ score }}/100</strong></p>
+    <br>
+    <a href="/">Retour à l'accueil</a>
+</body>
+</html>
