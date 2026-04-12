@@ -1,0 +1,14 @@
+import json
+
+def charger_donnees():
+    try:
+        with open("donnees.json", "r", encoding="utf-8") as fichier:
+            return json.load(fichier)
+    
+    except FileNotFoundError:
+        print("Le fichier 'donnees.json' n'existe pas.")
+        return []
+    
+
+   
+
