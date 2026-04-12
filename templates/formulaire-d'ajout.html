@@ -3,30 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <title>Ajouter un compte</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
 </head>
 <body>
     <h1>Nouveau Compte</h1>
     <form action="/create_mdp" method="post">
-        <label>Site :</label>
-        <input type="text" name="nom_site" required><br><br>
+        <div class="search-bar">
+            <label>Site :</label>
+            <input type="text" name="nom_site" required>
+        </div>
+        <br><br>
 
         <label>Catégorie :</label>
-        <select name="categorie">
+        <select name="categorie" class="bouton">
             {% for cat in categories %}
             <option value="{{ cat }}">{{ cat }}</option>
             {% endfor %}
-        </select><br><br>
+        </select> <br><br>
 
         <label>Longueur (8-64) :</label>
-        <input type="number" name="longueur" min="8" max="64" value="16"><br><br>
+        <input type="number" name="longueur" min="8" max="64" value="16" class="bouton"><br><br>
 
         <label>Méthode :</label>
-        <select name="type_mdp">
+        <select name="type_mdp" class="bouton">
             <option value="complexe">Complexe (Aléatoire + Spéciaux)</option>
             <option value="prononcable">Prononçable (Alternance syllabes)</option>
         </select><br><br>
 
-        <button type="submit">Générer et Enregistrer</button>
+        <button type="submit" class="bouton">Générer et Enregistrer</button>
     </form>
     <br>
     <a href="/">Retour</a>

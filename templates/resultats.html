@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Résultats de recherche</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
 </head>
 <body>
     <h1>Résultats pour : "{{ query }}"</h1>
@@ -25,7 +26,7 @@
             </tbody>
         </table>
     {% else %}
-        <p>Aucun compte trouvé pour ce site.</p>
+        <p>Aucun resultat.</p>
     {% endif %}
 
     <br>
